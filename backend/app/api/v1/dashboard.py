@@ -11,8 +11,11 @@ async def get_dashboard_summary(
     current_user: dict = Depends(get_current_user)
 ) -> Dict[str, Any]:
     
-    tenant_id = getattr(current_user, "tenant_id", "default_tenant") or "default_tenant"
-    
+
+    tenant_id = current_user.get("tenant_id")
+    if not tenant_id:
+        raise HTTPException(status_code=403, detail="Tenant ID missing in auth context")
+
     revenue_data = await get_revenue_summary(property_id, tenant_id)
     
     total_revenue_float = float(revenue_data['total'])
