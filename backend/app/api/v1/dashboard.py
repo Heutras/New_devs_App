@@ -12,7 +12,7 @@ async def get_dashboard_summary(
     current_user: dict = Depends(get_current_user)
 ) -> Dict[str, Any]:
     
-    tenant_id = current_user.get("tenant_id")
+    tenant_id = current_user.tenant_id
     if not tenant_id:
         raise HTTPException(status_code=401, detail="Invalid tenant context")
     

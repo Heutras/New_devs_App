@@ -66,6 +66,7 @@ async def get_user_accessible_cities(
             # Admin gets all available cities
             result = supabase.table('properties') \
                 .select('city') \
+                .eq('tenant_id', current_user.tenant_id) \
                 .neq('city', '') \
                 .not_.is_('city', 'null') \
                 .eq('status', 'active') \
@@ -93,6 +94,7 @@ async def get_user_accessible_cities(
                 # Get properties in accessible cities
                 result = supabase.table('properties') \
                     .select('city') \
+                    .eq('tenant_id', current_user.tenant_id) \
                     .neq('city', '') \
                     .not_.is_('city', 'null') \
                     .eq('status', 'active') \

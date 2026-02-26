@@ -1,16 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RevenueSummary } from "./RevenueSummary";
+import Api from '../apiConfig';
 
-const PROPERTIES = [
-  { id: 'prop-001', name: 'Beach House Alpha' },
-  { id: 'prop-002', name: 'City Apartment Downtown' },
-  { id: 'prop-003', name: 'Country Villa Estate' },
-  { id: 'prop-004', name: 'Lakeside Cottage' },
-  { id: 'prop-005', name: 'Urban Loft Modern' }
-];
+// Define the shape of our city/property data
+interface TenantProperty {
+  id: string;
+  name: string;
+  property_count: number;
+}
+
+export const getTenantProperties = async (): Promise<any> => {
+  // Your interceptor returns response.data directly
+  return Api.get('/cities/user-accessible') as any; 
+};
 
 const Dashboard: React.FC = () => {
-  const [selectedProperty, setSelectedProperty] = useState('prop-001');
+  // Change state to hold dynamic properties
+  const [properties, setProperties] = useState<TenantProperty[]>([]);
+  const [selectedProperty, setSelectedProperty] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getTenantProperties()
+      .then((res) => {
+        // Log to verify the response shape
+        console.log('API Response:', res);
+        
+        if (res.cities && res.cities.length > 0) {
+          setProperties(res.cities);
+          // Auto-select the first property in the list
+          setSelectedProperty(res.cities[0].id);
+        }
+      })
+      .catch(err => {
+        console.error("Fetch failed:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-4 lg:p-6 flex justify-center items-center min-h-screen">
+        <p className="text-gray-500">Loading properties...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 lg:p-6 min-h-full">
@@ -35,18 +71,29 @@ const Dashboard: React.FC = () => {
                   onChange={(e) => setSelectedProperty(e.target.value)}
                   className="block w-full sm:w-auto min-w-[200px] px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                 >
-                  {PROPERTIES.map((property) => (
+                  {/* Map over dynamic properties state */}
+                  {properties.map((property) => (
                     <option key={property.id} value={property.id}>
-                      {property.name}
+                      {property.name} ({property.property_count})
                     </option>
                   ))}
+                  {properties.length === 0 && (
+                    <option value="">No properties available</option>
+                  )}
                 </select>
               </div>
             </div>
           </div>
 
           <div className="space-y-6">
-            <RevenueSummary propertyId={selectedProperty} />
+            {/* Only render summary if a property is selected */}
+            {selectedProperty ? (
+              <RevenueSummary propertyId={selectedProperty} />
+            ) : (
+              <div className="text-center py-10 text-gray-400">
+                Please select a property to view revenue data.
+              </div>
+            )}
           </div>
         </div>
       </div>
