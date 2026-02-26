@@ -102,3 +102,11 @@ All the code, database schema, and sample data are provided in this repository.
 **Important**: The clients are expecting a resolution quickly. Take your time to understand the system, but remember that data accuracy and privacy are critical in property management.
 
 Good luck!
+
+## Found bugs
+- Double refreshing logs out the user.
+- Client A shouldn't see Lakeside Cottage and Urban Loft Modern
+- Both clients see same 5 properties. First 3 belongs to Client A.
+- There is 2 property with same id 'prop-001' for both clients and Client B's property went missing.
+- Client A needs to see only first 3 property.
+- Client B needs to see last 2 property and the missing 'prop-001' property.
