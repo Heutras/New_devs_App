@@ -277,6 +277,10 @@ async def authenticate_request(
             tenant_id=tenant_id,
         )
 
+        if not tenant_id:
+            logger.error(f"CRITICAL AUTH: Failed to resolve tenant for {user.email}")
+            raise HTTPException(status_code=401, detail="Account configuration error: Tenant not found")
+        
         # Cache the authentication result
         auth_cache[token_hash] = {
             "user": auth_user,
